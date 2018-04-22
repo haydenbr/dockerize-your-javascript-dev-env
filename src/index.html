@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Docker for JavaScript Developers</title>
+
+    <link rel="stylesheet" href="main.css">
+
+    <script type="text/javascript" src="plugin/markdown/marked.js"></script>
+    <script type="text/javascript" src="plugin/highlight/highlight.js"></script>
+    <script type="text/javascript" src="plugin/notes/notes.js"></script>
+  </head>
+  <body>
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+    <script src="main.js"></script>
+
+    <div class="reveal">
+      <div class="slides">
+        <section
+          class="intro-slide title-slide"
+        >
+          <div class="top-row">
+            <div class="title">Dockerize your JavaScript Dev Environment</div>
+            <img class="whale" src="./assets/images/docker-whale.png">
+          </div>
+          <div class="presenter">
+            <div class="avatar-container">
+              <div class="avatar"></div>
+            </div>
+            <div>
+              <div>Hayden Braxton</div>
+              <a target="_blank" href="https://twitter.com/hayden_dev">@hayden_dev</a>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="content-slide"
+        >
+          <div class="page-title">Before we get started</div>
+          <div>Install Docker!! <a target="_blank" href="https://www.docker.com/community-edition">docker.com/community-edition</a></div>
+          <br>
+          <div>Legacy Support <a target="_blank" href="https://docs.docker.com/toolbox/overview">docs.docker.com/toolbox/overview</a></div>
+          <br>
+          <div>Windows users, please switch to Linux containers</div>
+          <img src="./assets/images/switch-to-linux-containers.png">
+        </section>
+
+        <section class="content-slide">
+          <div class="page-title">Code Examples</div>
+
+          <a href="https://github.com/haydenbr/bob-is-cool">github.com/haydenbr/bob-is-cool</a>
+          <a href="https://github.com/haydenbr/new-years-resolutions">github.com/haydenbr/new-years-resolutions</a>
+        </section>
+
+        <section class="content-slide">
+          <div class="page-title">Agenda</div>
+
+          <ul>
+            <li>Intro to Docker</li>
+            <li>Break</li>
+            <li>Dockerize your JavaScript Development Environment</li>
+            <li class="fragment">Hopefully not see too many memes and GIFs</li>
+          </ul>
+
+          <aside class="notes">
+            <ul>
+              <li>lots of content</li>
+              <li>there will be a video</li>
+              <li>questions - relevant</li>
+              <li>t - shirts</li>
+              <li>memes: silly American</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">About me</div>
+          <ul>
+            <li>Richmond, VA - RVA</li>
+            <li>Software Engineer at <a target="_blank" href="https://www.unboxedtechnology.com/dev-talks/">Unboxed Technology</a></li>
+            <li>I play with code for fun</li>
+            <li class="fragment">Love me some (South) Indian food!</li>
+            <br>
+            <a target="_blank" href="https://twitter.com/hayden_dev">@hayden_dev</a>
+          </ul>
+
+          <aside class="notes">
+            <ul>
+              <li>Unboxed: unrelated to tech</li>
+              <li>Unboxed: L&D software products</li>
+              <li>Unboxed: Dev Talks</li>
+              <li>Primarily JavaScript</li>
+              <li>irrelevant info</li>
+              <li>How did I get started with Docker?</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <div class="section-title">Intro to Docker</div>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">What is Docker, really?</div>
+
+          <div>Docker is a virtualization technology that allows you to create isolated, minimalistic environments that contain only the absolute necessary dependencies needed for a specific purpose.</div>
+
+          <div>
+            <img style="float: right;" width="550px" src="./assets/images/docker-logo.png">
+          </div>
+
+          <aside class="notes">
+            <ul>
+              <li>specific purpose: app, service, tasks</li>
+              <li>Docker as a technology</li>
+              <li>container platform</li>
+              <li>other container platforms</li>
+              <li>Docker as a company</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Container <span style="text-transform: lowercase;">vs</span> VM</div>
+
+          <ul>
+            <li>VMs paritions physical computing resources</li>
+            <li>Containers parition OS resources</li>
+          </ul>
+
+          <aside class="notes">
+            <ul>
+              <li>physical partitions require time</li>
+              <li>container: lightweight VM?</li>
+              <li>container: virtual OS</li>
+              <li>containers share same computing resources</li>
+              <li>dynamic resource allocation</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section>
+          <div class="section-title">What is Docker?</div>
+
+          <div style="margin-top: 100px;">
+            <img width="700px" src="./assets/images/say-docker-one-more-time-i-dare-you.jpg">
+          </div>
+
+          <aside class="notes">
+            <ul>
+              <li>Containers and Images</li>
+              <li>Docker Hub</li>
+              <li>Docker Engine</li>
+              <li>Get our hands dirty!</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">What is a container?</div>
+
+          <ul>
+            <li>Virtual OS</li>
+            <li>Containers share their host kernel</li>
+          </ul>
+
+          <div>
+            <img width="400px" style="float: right;" src="./assets/images/container.jpg">
+          </div>
+
+          <aside class="notes">
+            <ul>
+              <li>file system, process tree, network stack</li>
+              <li>container env isolated from others and host</li>
+              <li>linux container on linux host</li>
+              <li>container is abstraction of kernel primitives</li>
+              <li>linux container on non-linux</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">What is an image?</div>
+
+          <ul>
+            <li>Describes how container should look</li>
+            <li>Containers are instances of image</li>
+            <li>We build images with Dockerfile</li>
+          </ul>
+
+          <aside class="notes">
+            <ul>
+              <li>Comparison to OS image</li>
+              <li>template</li>
+              <li>image is R/O</li>
+              <li>building images</li>
+              <li>build time vs. run time</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <div class="page-title">Image Layers</div>
+          <img src="./assets/images/image-layers.jpg">
+
+          <aside class="notes">
+            <ul>
+              <li>Each layer is an image</li>
+              <li>image is r/o</li>
+              <li>container rw layer</li>
+              <li>copy on write</li>
+              <li>union file system</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Docker hub</div>
+
+          <a target="_blank" href="https://hub.docker.com/">hub.docker.com</a>
+
+          <aside class="notes">
+            <ul>
+              <li>image registry</li>
+              <li>like github or npm</li>
+              <li>repos</li>
+              <li>official vs. non-official</li>
+              <li>image tags: versioning</li>
+              <li>latest tag</li>
+              <li>repo naming convention</li>
+              <li>Docker store</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section class="content-slide">
+          <a href="https://github.com/haydenbr/bob-is-cool">github.com/haydenbr/bob-is-cool</a>
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <div class="section-title">Dockerize your Dev Environment</div>
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <img width="800px" src="./assets/images/npm-start-y-u-no-work.jpg">
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <div class="section-title">The Problem</div>
+          <div class="section-subtitle">Dependencies are hard</div>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Global Dependencies</div>
+
+          <ul>
+            <li>OS</li>
+            <li>C++ Compiler</li>
+            <li>Node version</li>
+            <li>npm (or yarn) version</li>
+            <li>cli tools</li>
+          </ul>
+
+          <aside class="notes">
+            <ul>
+              <li>Different projects, different version of same thing</li>
+              <li>node version manager</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <img width="500px" src="./assets/images/npm-install-g-all-the-things.jpg">
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Project Dependencies</div>
+
+          <ul>
+            <li>Different versions over time</li>
+            <li>Peer dependencies</li>
+            <li>Someone else adds a new dependency</li>
+          </ul>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Common Solutions</div>
+
+          <pre>
+            <code class="bash" data-trim contenteditable>
+              alias npmplease🙏 = 'rm -rf node_modules && npm install'
+            </code>
+          </pre>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Common Solutions</div>
+
+          <pre>
+            <code class="bash" data-trim contenteditable>
+              rm -rf repo && git clone git@github.com/user/repo
+            </code>
+          </pre>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Common Solutions</div>
+
+          <pre>
+            <code class="bash" data-trim contenteditable>
+              git add node_modules
+            </code>
+          </pre>
+
+          <aside class="notes">
+            <ul>
+              <li>node version conflict</li>
+              <li>platform conflicts</li>
+              <li>giant repo</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Common Solutions</div>
+
+          <ul>
+            <li>Update global versions</li>
+            <li>Screw it!!!</li>
+          </ul>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Common Solutions</div>
+
+          <pre>
+            <code class="bash" data-trim contenteditable>
+              npm install node
+            </code>
+          </pre>
+
+          <aside class="notes">
+            <ul>
+              <li>not comfortable</li>
+              <li>only solves problem of node version</li>
+              <li>building binaries</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <img src="./assets/images/but-wait-isnt-docker-just-another-dependency.jpg">
+
+          <aside class="notes">
+            <ul>
+              <li>tradeoff</li>
+              <li>1 dep vs. 50 dep</li>
+              <li>docker is modular</li>
+              <li>containers aren't a fad</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Disclaimer</div>
+
+          <ul>
+            <li>Not the only solution</li>
+            <li>Prevention</li>
+          </ul>
+
+          <aside class="notes">
+            <ul>
+              <li>No Dogma</li>
+              <li>No Absolute solution</li>
+              <li>Prevents the problem: lock in deps</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <div class="section-title">Let's build the image</div>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Building the image</div>
+
+          <a href="https://github.com/haydenbr/bob-is-cool">github.com/haydenbr/bob-is-cool</a>
+
+          <aside class="notes">
+            <ul>
+              <li>best practices</li>
+              <li>make it work</li>
+              <li>prune it</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <div class="section-title">Does it work?</div>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Benefits</div>
+
+          <ul>
+            <li>Up-to-date dependencies</li>
+            <li>Everyone in the same environment</li>
+            <li>Versioned environments</li>
+            <li>Closer to production</li>
+          </ul>
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <div class="section-title">Bonus</div>
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <img style="display: block; margin: 0 auto;" width="700px" src="./assets/images/npm-install-hot-pockets.png">
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <div class="page-title">CI Builds</div>
+          <img src="./assets/images/bitbucket-pipeline.jpg">
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <div class="page-title">I need a volunteer</div>
+          <img src="./assets/images/volunteer.gif">
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Challenges?</div>
+          
+          <ul>
+            <li>Adding new dependencies</li>
+            <li>Running sync scripts</li>
+            <li>Language support</li>
+            <li>Building locally</li>
+          </ul>
+
+          <aside class="notes">
+            <ul>
+              <li>dont know about Docker</li>
+              <li>ideal sync setup</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <div class="section-title">What's next?</div>
+        </section>
+
+        <section>
+          <img width="500px" src="./assets/images/thanos.gif">
+        </section>
+        
+        <section>
+          <img width="600px" src="./assets/images/docker-compose.png">
+        </section>
+
+        <section>
+          <div class="page-title">Container Orchestration</div>
+          <img src="./assets/images/swarm-vs-kube.jpg">
+        </section>
+
+        <section
+          class="content-slide"
+          
+        >
+          <div class="page-title">Shout outs</div>
+          <div class="fragment">
+            <div>Nick <a target="_blank" href="https://twitter.com/NCapito">@NCapito</a></div>
+            <div>Sha <a target="_blank" href="https://twitter.com/hashtagcoder">@hashtagcoder</a></div>
+          </div>
+          <br>
+          <div class="fragment">
+            <div>Nigel Poulton <a target="_blank" href="https://twitter.com/nigelpoulton">@nigelpoulton</a></div>
+            <div>Bret Fisher <a target="_blank" href="https://twitter.com/BretFisher">@BretFisher</a></div>
+          </div>
+          <br>
+          <div class="fragment">
+            <div>John Zaccone <a target="_blank" href="https://twitter.com/JohnZaccone">@JohnZaccone</a></div>
+          </div>
+
+          <aside class="notes">
+            <ul>
+              <li>Nick, my boss, let me experiment</li>
+              <li>Sha, past co worker, original creator of example app</li>
+              <li>Docker captains, a lot of great content</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section data-background-image="./assets/images/dark-bg.png">
+          <div class="section-title">Questions?</div>
+        </section>
+
+        <section>
+          <div class="page-title">THANKS!</div>
+
+          <div class="final-image-container">
+            <img class="banana" src="./assets/images/banana.gif">
+            <img class="whale" src="./assets/images/docker-whale-containers.png">
+          </div>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>
