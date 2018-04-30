@@ -14,12 +14,57 @@ section {
 
 	&.content-slide {
 		text-align: left;
-		top: 40px !important;
+		top: 0 !important;
+	}
+
+	&.shipping-containers {
+		padding: 0 !important;
+		top: -10px !important;
+
+		img {
+			margin-top: 0 !important;
+		}
+	}
+
+	&.image-slide {
+		padding: 0 !important;
+
+		img {
+			margin: 0 !important;
+		}
 	}
 
 	&.title-slide {
 		text-align: left;
 		top: 0 !important;
+
+		img {
+			background: none !important;
+			box-shadow: none !important;
+		}
+	}
+
+	&.about-me {
+		.content-container {
+			display: flex;
+
+			.bullet {
+				margin-bottom: 25px;
+			}
+		}
+	}
+
+	&.dance {
+		display: flex !important;
+		flex-wrap: wrap;
+		position: absolute;
+		width: 1024px !important;
+	}
+
+	&.orchestration {
+		img {
+			box-shadow: none !important;
+		}
 	}
 
 	.section-title {

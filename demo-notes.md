@@ -1,284 +1,180 @@
-```bash
-docker version
-```
+# Demos
 
-## Containers
+## Docker Intro
 
 ```bash
-docker container run hello-world
-# what just happened?
-# docker run
 
-docker container run -it --name ubuntu-bash ubuntu bash
-ps -eaf # in ubuntu
+docker container run -it --name ubuntu-example ubuntu bash
+# -i container reads from stdin
+# -t pseudo terminal
+ps # looks and feels like debian, but is it?
+vim
+ifconfig
+man
+touch bob.txt
+echo "bob is cool" >> bob.txt # this was persisted to copy on write layer
 
-docker container ls
-docker container ls -a
-docker ps
+docker container run -p 8080:80 --name web-server nginx
+# publish ports. network traffic on port 8080 on host is channeled to port 80 in container
+
 ```
 
-- container names
-- docker container run: create container 
+## Deps Example
 
 ```bash
-docker container run -i -t --publish 8080:80 --name nginx-server nginx
-docker container rm nginx-server
 
-docker container run -d --publish 8080:80 --name nginx-server nginx
-docker container logs nginx-server
+# show there's no node_modules
+yarn start
+# search for TODO:example
+# title: 'Docker is cool!', message: 'Hey, you should run your apps in containers!'
+# watch the live reload!
 
-docker container stop nginx-server
-docker container start nginx-server
-docker container restart nginx-server # stops then starts container
-
-docker container stop nginx-server
-docker container rm nginx-server
 ```
 
-## Images
+### Notes
 
-- Main task of Docker is writing images
-- Image built from Dockerfile
-- start with a base image (scratch)
-- One layer for every line
-- rebuild: use cache
-- learning tip: study Dockerfiles from official repos and Docker Captains
+#### Benefits
+
+- developers always using the exact same node_modules!
+- no more "works on my machine" between developers
+- yarn scripts: Docker is just underneath the hood
+
+#### The image
+
+- ENV: set env variables
+- RUN: fewer the layers the better
+- WORKDIR:
+	- set current working directory
+	- changes are made relative to this dir
+	- defines working directory when container starts
+- ADD/COPY: add files to image
+- what is docker/package.json? Why would I do this?
+- EXPOSE: doesn't do anything. metadata, documentation as code
+- CMD:
+	- default process with which to start container (PID 1)
+	- overwrite by appending command and args to end of `docker run` or in compose file
+	- CMD vs. ENTRYPOINT
+- Observe: Things that change most towards end
+- Observe: No source in the image
+
+
+#### Compose file
+
+- cli isn't practical
+- compose abstracts things you can do with cli into a config file
+- `docker-compose up`, which was my `yarn start`
+- compose also let's you define multiple containers or "services"
+- volumes: plug in source and config files (dev workflow)
+- ports exposed for running app and dev server
+
+#### bump.js
+
+- new image built for every version
+- explain flow
+	- check if new version tag exists
+	- update package.json
+	- update any reference to version number
+		- compose files
+		- bitbucket pipelines
+		- config files
+	- commit and tag
+	- docker build and push
+	- git push
+- push last because of CI
+- small window for conflicts
+- for dev only / for prod: build on build server
+
+<!-- TODO: retest this workflow -->
+#### benefits
+
+add a dep?
 
 ```bash
-docker container run -it node:8.9.4 bash
+yarn dep:add pirate-speak
 ```
 
-```Dockerfile
-FROM node:8.9.4
+```JavaScript
+import { translate } from 'pirate-speak';
 
-RUN mkdir /opt/app
-WORKDIR /opt/app
+// ...
 
-# ENV variables like export
-ENV NODE_ENV=development
-
-# COPY vs ADD
-# copy from build context, into
-COPY package.json package.json
-COPY yarn.lock yarn.lock
-
-# RUN (command / change) the file system
-# intermediate containers are used to build images
-RUN yarn
-
-# we'll do something different with this later
-COPY tsconfig.json tsconfig.json
-COPY tslint.json tslint.json
-COPY .angular-cli.json .angular-cli.json
-COPY src src
-
-EXPOSE 4200
-
-# CMD vs ENTRYPOINT
-ENTRYPOINT [ "yarn", "serve" ]
+translate('Alert text');
 ```
+
+old version? Bug in older release?
 
 ```bash
-# build after COPY yarn.lock yarn.lock
-docker build -t haydenbr/bob-is-cool .
-
-# build context
-# -f option
-
-# built after COPY src src
-docker build -t haydenbr/bob-is-cool .
+get checkout v0
+# point out difference in deps
+yarn start
 ```
 
-- finish and build the whole thing
-- docker run it!
-- demonstrate cache
-	-- change src, rebuild
-	-- change package.json, rebuild
+CI Bonus: use already installed deps, half the build time
 
-## Mounts and Volumes
+#### downsides
 
-- Plug directories into container
-- bind mount: mount files from host machine
-- volumes: mount volumes from host machine in Docker managed storage
+- no language support (depends on local node_modules)
+- still need deps for workflow tasks
+- future state: not need ANY deps installed
+- not perfect: suggestions are welcome :)
 
-### Mounts
+### Full stack example
 
 ```bash
-mkdir bob
-docker container run --mount src=$(pwd)/bob,dst=/bob,type=bind ubuntu bash
+git clone
+cd new-years
+git submodule init
+git submodule update
+yarn start
 
-# in container
-echo 'Bob is cool!' >> bob.txt
+# check it on the browser
+# add some data
 
-# in new tab, on host
-cat bob/bob.txt
-docker container rm -v
+CTRL-C
+
+yarn down
+yarn start
+
+# check the data is still there
+# connect on mongo client
 ```
 
-```bash
-docker container run -it -p 4200:4200 --mount src=$(pwd)/src,dst=/opt/app/src,type=bind haydenbr/bob-is-cool
-```
+#### Dev conerns
 
-```bash
-docker volume create bob
-docker container run --mount src=bob,dst=/bob,type=volume ubuntu bash
-docker container run --mount src=bob,dst=/bob,type=volume alpine sh
-```
+- Debugging? I'm glad you asked
+	- turn on debugger in vscode
+	- open up get all controller and set break point
+	- issue get request from postman
+- Seed data?
+	- seed script `prestart`
+	- or image with seed data
+- Seed Image
+	- look at image
+	- look in data/db
 
-```bash
-docker volume create mongo-db
-docker volume create mongo-configdb
-docker run -d -p 27017:27017 --mount src=mongo-db,dst=/data/db,type=volume --mount src=mongo-configdb,dst=/data/configdb,type=volume --name mongod mongo:3.6.2-jessie mongod
-docker run --name mongo-shell -it --link mongod mongo:3.6.2-jessie bash
-mongo $MONGOD_PORT_27017_TCP_ADDR:$MONGOD_PORT_27017_TCP_PORT
-# read write from shell
-# read write from robo mongo
-# kill mongod and try to read
-```
+#### Compose files
 
-## Under the hood
+- how are the containers able to talk to each other? I'm glad you asked
+	- brdige networking provides automatic DNS resolution between containers
+	- they have their own ip address on the network, but we can refer to them by name
+- Persistence
+	- containers are persistent, but ephemeral
+	- expect containers to be thrown away
+	- store important data outside of containers
+- Docker volumes
+	- we can plug in local directories
+	- Docker managed volumes: mongo data
 
-### Control groups
+Client compose file: not that different. just added networks
 
-```bash
-docker run -it --memory 64m --memory-swap 64m ubuntu bash
-# docker stats in new tab
-:(){ :|: & };:
-```
+#### Images
 
-### Union file system
+Client image
 
-```bash
-docker run -it --privileged --pid=host debian nsenter -t 1 -m -u -n -i sh
-docker inspect haydenbr/bob-is-cool
-# ls each of the image layers
-
-docker run -it --name copy-on-write ubuntu bash
-echo 'Bob is cool!' >> bob.txt
-# inspect the container and ls the upperdir
-```
-
-```Dockerfile
-FROM node:8.9.4
-LABEL maintainer="Unboxed Technology LLC, https://unboxedtechnology.com"
-
-ENV NODE_ENV=development
-
-RUN apt-get update
-RUN apt-get install ncftp
-
-RUN mkdir /opt/app
-WORKDIR /opt/app
-ADD . /opt/app
-RUN yarn
-
-EXPOSE 8100 35729 53703
-```
-
-```.dockerignore
-.git
-node_modules
-```
-
-```Dockerfile
-FROM node:8.9.4
-LABEL maintainer="Unboxed Technology LLC, https://unboxedtechnology.com"
-
-ENV NODE_ENV=development
-
-RUN apt-get update
-RUN apt-get install ncftp
-
-RUN mkdir /opt/app
-WORKDIR /opt/app
-ADD package.json package.json
-RUN yarn
-ADD . /opt/app
-
-EXPOSE 8100 35729 53703
-ENTRYPOINT [ "npm", "run", "serve" ]
-```
-
-```Dockerfile
-FROM node:8.9.4
-LABEL maintainer="Unboxed Technology LLC, https://unboxedtechnology.com"
-
-ENV NODE_ENV=development
-
-RUN apt-get update
-RUN apt-get install ncftp
-
-RUN mkdir /opt/app
-WORKDIR /opt/app
-ADD docker/package.json package.json
-RUN yarn
-
-ADD ionic.config.json ionic.config.json
-ADD docker/config.xml config.xml
-ADD /scripts /scripts
-ADD /webpack /webpack
-ADD tslint.json tslint.json
-ADD tsconfig.json tsconfig.json
-ADD package.json package.json
-ADD config.xml config.xml
-
-EXPOSE 8100 35729 53703
-ENTRYPOINT [ "npm", "run", "serve" ]
-```
-
-```Dockerfile
-FROM node:8.9.4
-LABEL maintainer="Unboxed Technology LLC, https://unboxedtechnology.com"
-
-ENV NODE_ENV=development
-
-RUN apt-get update
-RUN apt-get install ncftp
-
-RUN mkdir /opt/app
-WORKDIR /opt/app
-ADD docker/package.json package.json
-RUN yarn
-
-# for live reload
-EXPOSE 8100 35729 53703
-ENTRYPOINT [ "npm", "run", "serve" ]
-```
-
-```Dockerfile
-FROM node:8.9.4-alpine
-LABEL maintainer="Unboxed Technology LLC, https://unboxedtechnology.com"
-
-ENV NODE_ENV=development
-
-RUN mkdir /opt/app && \
-		apk update && \
-		apk add --no-cache ncftp=3.2.6-r1 && \
-		rm -r /var/cache/apk
-WORKDIR /opt/app	
-
-ADD docker/package.json package.json
-RUN yarn && yarn cache clean
-
-EXPOSE 8100 35729 53703
-ENTRYPOINT [ "npm", "run", "serve" ]
-```
-
-```.dockerignore
-.git
-.gitignore
-*.json
-*.md
-*.xml
-docker-compose.yml
-node_modules
-platforms
-plugins
-resources
-scripts
-src
-webpack
-www
-```
-
-- look at the bump script: copy dependencies
+- multi-stage build
+	- smallest images possible
+	- node of the extra deps end up in final image
+- source?
+	- dev plug in source
+	- prod include source
+	- ship and run!
