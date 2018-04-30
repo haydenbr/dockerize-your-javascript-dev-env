@@ -26,6 +26,13 @@ section {
 		}
 	}
 
+	&.union-file-system {
+		img {
+			background: none !important;
+			box-shadow: none !important;
+		}		
+	}
+
 	&.image-slide {
 		padding: 0 !important;
 

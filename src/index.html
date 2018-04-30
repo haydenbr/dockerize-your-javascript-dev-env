@@ -310,8 +310,9 @@
 
                 RUN apk update && apk add nodejs
                 RUN npm i -g cowsay
-                COPY app /app
-                WORKDIR /app
+                RUN mkdir /opt/app
+                WORKDIR /opt/app
+                COPY . .
                 RUN npm install
 
                 EXPOSE 3000
@@ -347,20 +348,46 @@
           </aside>
         </section>
 
-        <section class="content-slide">
-          <div>image layer illustration</div>
+        <section
+          class="image-slide union-file-system"
+          data-background-image="./assets/images/dark-bg.png"
+        >
+          <img src="./assets/images/image-union-file-system.001.png">
+        </section>
 
-          <!-- TODO: make these layers mirror image example -->
+        <section
+          class="image-slide union-file-system"
+          data-background-image="./assets/images/dark-bg.png"
+        >
+          <img src="./assets/images/image-union-file-system.002.png">
+        </section>
 
-          <aside class="notes">
-            <ul>
-              <li>base linux fs</li>
-              <li>install node</li>
-              <li>npm i -g cowsay</li>
-              <li>add app code</li>
-              <li>npm i</li>
-            </ul>
-          </aside>
+        <section
+          class="image-slide union-file-system"
+          data-background-image="./assets/images/dark-bg.png"
+        >
+          <img src="./assets/images/image-union-file-system.003.png">
+        </section>
+
+        <section
+          class="image-slide union-file-system"
+          data-background-image="./assets/images/dark-bg.png"
+        >
+          <img src="./assets/images/image-union-file-system.004.png">
+        </section>
+
+        <section
+          class="image-slide union-file-system"
+          data-background-image="./assets/images/dark-bg.png"
+        >
+          <img src="./assets/images/image-union-file-system.005.png">
+        </section>
+
+        <section
+          class="image-slide union-file-system"
+          data-background-image="./assets/images/dark-bg.png"
+        >
+          <img src="./assets/images/image-union-file-system.006.png">
         </section>
 
         <section
